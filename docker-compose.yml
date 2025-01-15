@@ -1,0 +1,38 @@
+name: kintsay
+services:
+    redis:
+        container_name: redis
+        environment:
+            - TZ=Asia/Manila
+        ports:
+            - 6379:6379
+        networks:
+            - local-services
+  
+        restart: unless-stopped
+        image: redis:latest
+
+    celery-worker:
+        container_name: celery-worker
+        environment:
+            - TZ=Asia/Manila
+        networks:
+            - local-services
+        volumes:
+           - ./src:/app
+        image: python:3.13-slim
+        entrypoint: ["/bin/bash", "/app/entrypoint.sh"]
+           
+        restart: unless-stopped
+        depends_on:
+        - redis
+        
+        
+
+
+
+networks:
+  local-services:
+    # Specify driver options
+    driver: bridge
+    external: true
